@@ -1,0 +1,23 @@
+limit:
+  enable: true
+  qps: 2000
+  address:
+    enable: true
+    qps: 200
+    list:
+      - key: 127.0.0.1
+        qps: 20
+      - key: 10.9.9.1
+        qps: 25
+  target:
+    enable: true
+    qps: 300
+    list:
+      - key: /api/hello
+        qps: 200
+  client:
+    enable: true
+    qps: 20
+    list:
+      - key: 1001
+        qps: 10
