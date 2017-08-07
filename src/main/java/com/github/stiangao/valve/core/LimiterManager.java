@@ -9,21 +9,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LimiterManager implements Limiter {
 
+    private final String KEY_ALL = "ALL";
+
     private LimiterConfig config;
+
+    private LimitRecorder recorder;
     private ConcurrentHashMap<String, RateLimiter> limiterMap = new ConcurrentHashMap<>();
 
-    private RateLimiter globalRateLimiter;
-
-    public LimiterManager(LimiterConfig config) {
+    public LimiterManager(LimiterConfig config, LimitRecorder recorder) {
         this.config = config;
-        globalRateLimiter = RateLimiter.create(config.getGlobalLimitQps());
-    }
-
-    public boolean pass() {
-        if (!config.enableLimit()) {
-            return true;
-        }
-        return globalRateLimiter.tryAcquire();
+        this.recorder = recorder;
+        limiterMap.put(KEY_ALL, RateLimiter.create(config.getQps(LimiterType.All, null)));
     }
 
     public boolean pass(LimiterType type, String key) {
@@ -36,7 +32,9 @@ public class LimiterManager implements Limiter {
             limiterMap.put(mapKey, genLimiter(type, key));
             return true;
         }
-        return rateLimiter.tryAcquire();
+        boolean pass = rateLimiter.tryAcquire();
+        recorder.record(type, key, pass);
+        return pass;
     }
 
     private RateLimiter genLimiter(LimiterType type, String key) {
@@ -45,14 +43,16 @@ public class LimiterManager implements Limiter {
     }
 
     private String genKey(LimiterType type, String key) {
-
+        if (type.equals(LimiterType.All)) {
+            return KEY_ALL;
+        }
         return type.toString() + "#" + key;
     }
 
 
     @Override
     public boolean visit(String ip, String cid, String uri) {
-        if (!pass()) {
+        if (!pass(LimiterType.All, null)) {
             return false;
         }
         if (!pass(LimiterType.Address, ip)) {
@@ -66,4 +66,9 @@ public class LimiterManager implements Limiter {
         }
         return true;
     }
+
+    public LimitRecorder getRecorder() {
+        return recorder;
+    }
+
 }

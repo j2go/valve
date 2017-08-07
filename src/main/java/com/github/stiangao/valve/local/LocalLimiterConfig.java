@@ -37,6 +37,8 @@ public class LocalLimiterConfig implements LimiterConfig {
 
     public int getQps(LimiterType type, String key) {
         switch (type) {
+            case All:
+                return globalLimitQps;
             case Address:
                 return getAddressQps(key);
             case Target:
@@ -62,16 +64,10 @@ public class LocalLimiterConfig implements LimiterConfig {
         return v == null ? defaultAddressLimitQps : v;
     }
 
-    public int getGlobalLimitQps() {
-        return globalLimitQps;
-    }
-
-    public boolean enableLimit() {
-        return enableLimit;
-    }
-
     public boolean enableLimit(LimiterType type) {
         switch (type) {
+            case All:
+                return enableLimit;
             case Address:
                 return enableAddressLimit;
             case Target:

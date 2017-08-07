@@ -1,5 +1,6 @@
 package com.github.stiangao.valve.autoconfigure;
 
+import com.github.stiangao.valve.core.LimitRecorder;
 import com.github.stiangao.valve.core.Limiter;
 import com.github.stiangao.valve.core.LimiterConfig;
 import com.github.stiangao.valve.core.LimiterManager;
@@ -11,8 +12,8 @@ public class BootLimiter implements Limiter {
 
     LimiterManager limiterManager;
 
-    public BootLimiter(LimiterConfig config) {
-        limiterManager = new LimiterManager(config);
+    public BootLimiter(LimiterConfig config, LimitRecorder recorder) {
+        limiterManager = new LimiterManager(config, recorder);
     }
 
     @Override

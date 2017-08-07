@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,8 @@ public class AutoConfiguration {
     }
 
     @Configuration
-    @ConfigurationProperties(prefix = "limit", locations = "classpath:valve.yml")
+    @ConfigurationProperties(prefix = "limit")
+    @PropertySource("classpath:valve.yml")
     @Data
     public static class ValveConfig implements LimiterConfig {
         private boolean enable = false;
@@ -61,39 +63,35 @@ public class AutoConfiguration {
         }
 
         @Override
-        public int getGlobalLimitQps() {
-            return qps;
-        }
-
-        @Override
         public int getQps(LimiterType type, String key) {
             switch (type) {
+                case All:
+                    return qps;
                 case Address:
                     return address.getQps(key);
                 case Target:
                     return target.getQps(key);
                 case Client:
                     return client.getQps(key);
+                default:
+                    return 0;
             }
-            return 0;
-        }
-
-        @Override
-        public boolean enableLimit() {
-            return enable;
         }
 
         @Override
         public boolean enableLimit(LimiterType type) {
             switch (type) {
+                case All:
+                    return enable;
                 case Address:
                     return address.isEnable();
                 case Target:
                     return target.isEnable();
                 case Client:
                     return client.isEnable();
+                default:
+                    return false;
             }
-            return false;
         }
     }
 }
