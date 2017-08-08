@@ -1,8 +1,8 @@
 package com.github.stiangao.valve.local;
 
+import com.github.stiangao.valve.core.LimitRecorder;
 import com.github.stiangao.valve.core.Limiter;
 import com.github.stiangao.valve.core.LimiterManager;
-import com.github.stiangao.valve.core.LimiterType;
 
 /**
  * Created by ttgg on 2017/8/4.
@@ -15,7 +15,8 @@ public class LocalLimiter implements Limiter {
     public LocalLimiter() {
         localLimiterConfig = new LocalLimiterConfig();
         localLimiterConfig.load();
-        limiterManager = new LimiterManager(localLimiterConfig);
+        LimitRecorder recorder = new LocalLimitRecorder();
+        limiterManager = new LimiterManager(localLimiterConfig, recorder);
     }
 
     @Override
