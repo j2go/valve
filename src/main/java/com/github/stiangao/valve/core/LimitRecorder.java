@@ -11,8 +11,8 @@ public interface LimitRecorder {
 
     long getRecordNum(LimiterType type, String key, boolean pass);
 
-    Map<String,Long> getPassRecord(LimiterType type);
+    Map<String,Long> getRecordInfo();
 
-    Map<String,Long> getRefuseRecord(LimiterType type);
+    void clear();
 
 }

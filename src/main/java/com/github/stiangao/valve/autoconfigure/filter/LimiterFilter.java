@@ -20,15 +20,16 @@ import java.io.IOException;
 public class LimiterFilter implements Filter {
 
     BootLimiter bootLimiter;
+    LocalLimitRecorder recorder;
 
     public LimiterFilter(LimiterConfig config) {
-        LocalLimitRecorder recorder = new LocalLimitRecorder();
+        recorder = new LocalLimitRecorder();
         bootLimiter = new BootLimiter(config, recorder);
     }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
+    //none
     }
 
     @Override
@@ -36,10 +37,10 @@ public class LimiterFilter implements Filter {
         String host = request.getRemoteHost();
 
         HttpServletRequest req = (HttpServletRequest) request;
-        String cid = req.getSession().getId();
+        String sid = req.getSession().getId();
         String target = req.getRequestURI();
 
-        if (!bootLimiter.visit(host, cid, target)) {
+        if (!bootLimiter.visit(host, sid, target)) {
             HttpServletResponse resp = (HttpServletResponse) response;
             resp.sendError(403);
             return;
@@ -49,6 +50,6 @@ public class LimiterFilter implements Filter {
 
     @Override
     public void destroy() {
-
+    //none
     }
 }

@@ -27,7 +27,7 @@ public class LocalLimiterConfig implements LimiterConfig {
     private boolean enableTargetLimit = false;
     private Map<String, Integer> targetConfigMap = new HashMap<>();
 
-    //TODO
+    //TODO read valve.yml file, parse to config
     public void load() {
         InputStream fileStream = getClass().getClassLoader().getResourceAsStream("valve.yml");
         Yaml yaml = new Yaml();
@@ -37,13 +37,13 @@ public class LocalLimiterConfig implements LimiterConfig {
 
     public int getQps(LimiterType type, String key) {
         switch (type) {
-            case All:
+            case ALL:
                 return globalLimitQps;
-            case Address:
+            case ADDRESS:
                 return getAddressQps(key);
-            case Target:
+            case TARGET:
                 return getTargetQps(key);
-            case Client:
+            case CLIENT:
                 return getClientQps(key);
         }
         return 0;
@@ -66,13 +66,13 @@ public class LocalLimiterConfig implements LimiterConfig {
 
     public boolean enableLimit(LimiterType type) {
         switch (type) {
-            case All:
+            case ALL:
                 return enableLimit;
-            case Address:
+            case ADDRESS:
                 return enableAddressLimit;
-            case Target:
+            case TARGET:
                 return enableTargetLimit;
-            case Client:
+            case CLIENT:
                 return enableClientLimit;
         }
         return false;

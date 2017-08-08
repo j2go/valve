@@ -65,13 +65,13 @@ public class AutoConfiguration {
         @Override
         public int getQps(LimiterType type, String key) {
             switch (type) {
-                case All:
+                case ALL:
                     return qps;
-                case Address:
+                case ADDRESS:
                     return address.getQps(key);
-                case Target:
+                case TARGET:
                     return target.getQps(key);
-                case Client:
+                case CLIENT:
                     return client.getQps(key);
                 default:
                     return 0;
@@ -81,13 +81,13 @@ public class AutoConfiguration {
         @Override
         public boolean enableLimit(LimiterType type) {
             switch (type) {
-                case All:
+                case ALL:
                     return enable;
-                case Address:
+                case ADDRESS:
                     return address.isEnable();
-                case Target:
+                case TARGET:
                     return target.isEnable();
-                case Client:
+                case CLIENT:
                     return client.isEnable();
                 default:
                     return false;
