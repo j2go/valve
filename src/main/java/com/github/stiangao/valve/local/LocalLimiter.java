@@ -15,7 +15,8 @@ public class LocalLimiter implements Limiter {
     public LocalLimiter() {
         localLimiterConfig = new LocalLimiterConfig();
         localLimiterConfig.load();
-        LimitRecorder recorder = new LocalLimitRecorder();
+
+        LimitRecorder recorder = new LocalLimitRecorder(null);
         limiterManager = new LimiterManager(localLimiterConfig, recorder);
     }
 

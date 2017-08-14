@@ -3,6 +3,7 @@ package com.github.stiangao.valve.autoconfigure;
 import com.github.stiangao.valve.autoconfigure.filter.LimiterFilter;
 import com.github.stiangao.valve.core.LimiterConfig;
 import com.github.stiangao.valve.core.LimiterType;
+import com.github.stiangao.valve.core.ReporterConfig;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,12 +24,14 @@ import java.util.Map;
 public class AutoConfiguration {
 
     @Autowired
-    ValveConfig valveConfig;
+    ValveLimiterConfig limiterConfig;
+//    @Autowired
+//    ReporterConfig reporterConfig;
 
     @Bean
     public FilterRegistrationBean limiterFilterRegister() {
         FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        registrationBean.setFilter(new LimiterFilter(valveConfig));
+        registrationBean.setFilter(new LimiterFilter(limiterConfig, null));
         registrationBean.setName("valve");
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
@@ -38,7 +41,7 @@ public class AutoConfiguration {
     @ConfigurationProperties(prefix = "limit")
     @PropertySource("classpath:valve.yml")
     @Data
-    public static class ValveConfig implements LimiterConfig {
+    public static class ValveLimiterConfig implements LimiterConfig {
         private boolean enable = false;
         private int qps = 99999;
 
@@ -94,4 +97,16 @@ public class AutoConfiguration {
             }
         }
     }
+
+//    @Configuration
+//    @ConfigurationProperties(prefix = "report")
+//    @PropertySource("classpath:valve.yml")
+//    @Data
+//    public static class ValveReporterConfig implements ReporterConfig {
+//        private int notifyTimes;
+//        private int periodMinutes;
+//        private String sender;
+//        private String senderPassword;
+//        private String receiver;
+//    }
 }

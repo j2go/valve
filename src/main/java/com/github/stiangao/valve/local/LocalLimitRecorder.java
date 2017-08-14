@@ -15,6 +15,12 @@ public class LocalLimitRecorder implements LimitRecorder {
 
     private Map<String, AtomicLong> countMap = new ConcurrentHashMap<>();
 
+    private LocalReporter localReporter;
+
+    public LocalLimitRecorder(LocalReporter localReporter) {
+        this.localReporter = localReporter;
+    }
+
     @Override
     public void record(LimiterType type, String key, boolean pass) {
         String mapKey = getKey(type, key, pass);
@@ -24,6 +30,9 @@ public class LocalLimitRecorder implements LimitRecorder {
             countMap.put(mapKey, new AtomicLong(1));
         } else {
             counter.incrementAndGet();
+        }
+        if (!pass && localReporter != null) {
+            localReporter.commit(type, key);
         }
     }
 

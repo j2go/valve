@@ -2,7 +2,9 @@ package com.github.stiangao.valve.autoconfigure.filter;
 
 import com.github.stiangao.valve.autoconfigure.BootLimiter;
 import com.github.stiangao.valve.core.LimiterConfig;
+import com.github.stiangao.valve.core.ReporterConfig;
 import com.github.stiangao.valve.local.LocalLimitRecorder;
+import com.github.stiangao.valve.local.LocalReporter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -22,9 +24,10 @@ public class LimiterFilter implements Filter {
     BootLimiter bootLimiter;
     LocalLimitRecorder recorder;
 
-    public LimiterFilter(LimiterConfig config) {
-        recorder = new LocalLimitRecorder();
-        bootLimiter = new BootLimiter(config, recorder);
+    public LimiterFilter(LimiterConfig limiterConfig, ReporterConfig reporterConfig) {
+        LocalReporter localReporter = new LocalReporter(reporterConfig);
+        recorder = new LocalLimitRecorder(localReporter);
+        bootLimiter = new BootLimiter(limiterConfig, recorder);
     }
 
     @Override

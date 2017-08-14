@@ -9,8 +9,7 @@ import com.github.stiangao.valve.local.LocalLimiterConfig;
 public class LocalLimiterConfigTest {
 
     public static void main(String[] args) {
-        LocalLimiterConfig config = new LocalLimiterConfig();
-        config.load();
+        System.out.println(String.format("%x", 2097233));
     }
 
 }

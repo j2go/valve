@@ -21,3 +21,9 @@ limit:
     list:
       - key: 1001
         qps: 10
+report:
+  sender: 17621603076@163.com
+  sender_password: 123qwe
+  receiver: tiangao1102@163.com
+  notify_times: 3
+  period_minutes: 1

@@ -1,7 +1,12 @@
 package com.github.stiangao.valve.local;
 
+import com.github.stiangao.valve.core.LimiterConfig;
 import com.github.stiangao.valve.core.LimiterType;
+import com.github.stiangao.valve.core.ReporterConfig;
+import io.github.biezhi.ome.OhMyEmail;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,25 +20,26 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by ttgg on 2017/8/13.
  */
-public class LocalAlarm implements Runnable {
+@Slf4j
+public class LocalReporter implements Runnable {
 
     private int limitTimes;
     private Map<String, Integer> notPassMap = new HashMap<>();
     private Set<String> tempRecordSet = new HashSet<>();
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
+    private String sender;
+    private String receiver;
 
-    public LocalAlarm() {
-        this(5);
-    }
-
-    public LocalAlarm(int reportTimes) {
-        this(reportTimes, 5);
-    }
-
-    public LocalAlarm(int limitTimes, int period) {
-        this.limitTimes = limitTimes;
+    public LocalReporter(ReporterConfig config) {
+        limitTimes = config.getNotifyTimes();
+        int period = config.getPeriodMinutes();
         executorService.scheduleAtFixedRate(this, period, period, TimeUnit.MINUTES);
+
+        sender = config.getSender();
+        receiver = config.getReceiver();
+
+        OhMyEmail.config(OhMyEmail.SMTP_163(true), config.getSender(), config.getSenderPassword());
     }
 
     public void commit(LimiterType type, String key) {
@@ -65,34 +71,18 @@ public class LocalAlarm implements Runnable {
         });
         notPassMap.forEach((k, times) -> {
             if (times > limitTimes) {
-                notify(k);
+                report(k);
                 needClearKeys.add(k);
             }
         });
         needClearKeys.forEach(e -> notPassMap.remove(e));
     }
 
-    private void notify(String key) {
-
-    }
-
-    public static void main(String[] args) {
-        Map<String, Integer> map = new HashMap<>();
-        map.put("a", 1);
-        map.put("b", 1);
-        map.put("c", 1);
-        map.put("d", 1);
-        map.put("e", 1);
-
-        map.forEach((k, v) -> {
-            if (k == "a" || k == "c") {
-                map.put(k, v + 1);
-            } else {
-                map.put(k, v - 1);
-            }
-        });
-        map.remove("d");
-        System.out.println(map);
-
+    private void report(String key) {
+        try {
+            OhMyEmail.subject("notify").from(sender).to(receiver).html("<h1>" + key + "</h1>").send();
+        } catch (MessagingException e) {
+            log.error("LocalReporter send email error.", e);
+        }
     }
 }
